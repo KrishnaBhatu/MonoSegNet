@@ -51,26 +51,26 @@ def post_process_disparity(disp):
 def test_simple(params):
     """Test function."""
 
-    left  = tf.placeholder(tf.float32, [1, args.input_height, args.input_width, 3])
-    right  = tf.placeholder(tf.int32, [1, args.input_height, args.input_width, 1])
+    left  = tf.placeholder(tf.float32, [2, args.input_height, args.input_width, 3])
+    #right  = tf.placeholder(tf.int32, [1, args.input_height, args.input_width, 1])
     model = MonodepthModel(params, "test", left, None)
 
     input_image = scipy.misc.imread(args.image_path, mode="RGB")
-    label_image = scipy.misc.imread("/home/krishna/Pictures/bochum_000000_024196_gtFine_labelIds.png")
+    #label_image = scipy.misc.imread("/home/krishna/Pictures/bochum_000000_024196_gtFine_labelIds.png")
     #cv2.imshow("Frag", input_image)
     #cv2.waitKey(0)
     
     
     original_height, original_width, num_channels = input_image.shape
     input_image = scipy.misc.imresize(input_image, [args.input_height, args.input_width], interp='lanczos')
-    label_image = scipy.misc.imresize(label_image, [args.input_height, args.input_width])
+    #label_image = scipy.misc.imresize(label_image, [args.input_height, args.input_width])
    
     #label_image = label_image.astype(np.float32)
     
     input_image = input_image.astype(np.float32) / 255
-    #input_images = np.stack((input_image, np.fliplr(input_image)), 0)
+    input_images = np.stack((input_image, np.fliplr(input_image)), 0)
     input_image = tf.reshape(input_image, [1, args.input_height, args.input_width, 3])
-    label_image = tf.reshape(label_image, [1, args.input_height, args.input_width, 1])
+    #label_image = tf.reshape(label_image, [1, args.input_height, args.input_width, 1])
     
     # SESSION
     config = tf.ConfigProto(allow_soft_placement=True)
@@ -97,9 +97,9 @@ def test_simple(params):
     restore_path = args.checkpoint_path.split(".")[0]
     train_saver.restore(sess, restore_path)
 
-    #disp = sess.run(model.disp_left_est[0], feed_dict={left: input_images})
-    #disp_pp = post_process_disparity(disp.squeeze()).astype(np.float32)
-    disp_pp = sess.run(model.logit, feed_dict={left: input_image})
+    disp = sess.run(model.disp_left_est[0], feed_dict={left: input_images})
+    disp_pp = post_process_disparity(disp.squeeze()).astype(np.float32)
+    out_seg = sess.run(model.logit, feed_dict={left: input_images})
     
     #lab = sess.run(model.right, feed_dict={right: label_image})
     #print()
@@ -119,7 +119,7 @@ def test_simple(params):
     
     for i in range(0, 256):
         for j in range(0, 512):
-            b = np.argmax(disp_pp[0,i,j,:])
+            b = np.argmax(out_seg[0,i,j,:])
             #print(disp_pp[0,i,j,:])
             copy_image[i][j] = b*5
             #print(b)
@@ -127,10 +127,10 @@ def test_simple(params):
             #cv2.waitKey(0)
             #break
         #break
-    cv2.imwrite("/home/krishna/magic1.png",copy_image)
-    for i in range(0, 33):
-        disp_to_img = scipy.misc.imresize(disp_pp[0,:,:,i].squeeze(), [original_height, original_width])
-        plt.imsave(os.path.join(output_directory, "{}_disp.png".format(output_name + str(i+50))), disp_to_img, cmap='plasma')
+    cv2.imwrite("/home/krishna/magic69.png",copy_image)
+    
+    disp_to_img = scipy.misc.imresize(disp_pp.squeeze(), [original_height, original_width])
+    plt.imsave(os.path.join(output_directory, "{}_disp.png".format(output_name + str(i+50))), disp_to_img, cmap='plasma')
     
     print('done!')
 

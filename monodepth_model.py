@@ -48,8 +48,8 @@ class MonodepthModel(object):
         self.reuse_variables = reuse_variables
 
         self.build_model()
-        #if(self.mode == 'train' or self.mode == 'test'):
-        #    self.build_outputs()
+        if(self.mode == 'train' or self.mode == 'test'):
+            self.build_outputs()
 
         if self.mode == 'test':
             #self.segmentation_losses()
@@ -296,38 +296,6 @@ class MonodepthModel(object):
             skip5 = conv4
         
         # DECODING
-        #with tf.variable_scope('decoder'):
-        #    upconv6 = upconv(conv5,   512, 3, 2) #H/32
-        #    concat6 = tf.concat([upconv6, skip5], 3)
-        #    iconv6  = conv(concat6,   512, 3, 1)
-#
-        #    upconv5 = upconv(iconv6, 256, 3, 2) #H/16
-        #    concat5 = tf.concat([upconv5, skip4], 3)
-        #    iconv5  = conv(concat5,   256, 3, 1)
-#
-        #    upconv4 = upconv(iconv5,  128, 3, 2) #H/8
-        #    concat4 = tf.concat([upconv4, skip3], 3)
-        #    iconv4  = conv(concat4,   128, 3, 1)
-        #    self.disp4 = self.get_disp(iconv4)
-        #    udisp4  = self.upsample_nn(self.disp4, 2)
-#
-        #    upconv3 = upconv(iconv4,   64, 3, 2) #H/4
-        #    concat3 = tf.concat([upconv3, skip2, udisp4], 3)
-        #    iconv3  = conv(concat3,    64, 3, 1)
-        #    self.disp3 = self.get_disp(iconv3)
-        #    udisp3  = self.upsample_nn(self.disp3, 2)
-#
-        #    upconv2 = upconv(iconv3,   32, 3, 2) #H/2
-        #    concat2 = tf.concat([upconv2, skip1, udisp3], 3)
-        #    iconv2  = conv(concat2,    32, 3, 1)
-        #    self.disp2 = self.get_disp(iconv2)
-        #    udisp2  = self.upsample_nn(self.disp2, 2)
-#
-        #    upconv1 = upconv(iconv2,  16, 3, 2) #H
-        #    concat1 = tf.concat([upconv1, udisp2], 3)
-        #    iconv1  = conv(concat1,   16, 3, 1)
-        #    self.disp1 = self.get_disp(iconv1)
-        
         with tf.variable_scope('decoder'):
             upconv6 = upconv(conv5,   512, 3, 2) #H/32
             concat6 = tf.concat([upconv6, skip5], 3)
@@ -340,26 +308,58 @@ class MonodepthModel(object):
             upconv4 = upconv(iconv5,  128, 3, 2) #H/8
             concat4 = tf.concat([upconv4, skip3], 3)
             iconv4  = conv(concat4,   128, 3, 1)
+            self.disp4 = self.get_disp(iconv4)
+            udisp4  = self.upsample_nn(self.disp4, 2)
+
+            upconv3 = upconv(iconv4,   64, 3, 2) #H/4
+            concat3 = tf.concat([upconv3, skip2, udisp4], 3)
+            iconv3  = conv(concat3,    64, 3, 1)
+            self.disp3 = self.get_disp(iconv3)
+            udisp3  = self.upsample_nn(self.disp3, 2)
+
+            upconv2 = upconv(iconv3,   32, 3, 2) #H/2
+            concat2 = tf.concat([upconv2, skip1, udisp3], 3)
+            iconv2  = conv(concat2,    32, 3, 1)
+            self.disp2 = self.get_disp(iconv2)
+            udisp2  = self.upsample_nn(self.disp2, 2)
+
+            upconv1 = upconv(iconv2,  16, 3, 2) #H
+            concat1 = tf.concat([upconv1, udisp2], 3)
+            iconv1  = conv(concat1,   16, 3, 1)
+            self.disp1 = self.get_disp(iconv1)
+        
+        with tf.variable_scope('segmentation_decoder'):
+            seg_upconv6 = upconv(conv5,   512, 3, 2) #H/32
+            seg_concat6 = tf.concat([seg_upconv6, skip5], 3)
+            seg_iconv6  = conv(seg_concat6,   512, 3, 1)
+
+            seg_upconv5 = upconv(seg_iconv6, 256, 3, 2) #H/16
+            seg_concat5 = tf.concat([seg_upconv5, skip4], 3)
+            seg_iconv5  = conv(seg_concat5,   256, 3, 1)
+
+            seg_upconv4 = upconv(seg_iconv5,  128, 3, 2) #H/8
+            seg_concat4 = tf.concat([seg_upconv4, skip3], 3)
+            seg_iconv4  = conv(seg_concat4,   128, 3, 1)
             #self.disp4 = self.get_disp(iconv4)
             #udisp4  = self.upsample_nn(self.disp4, 2)
 
-            upconv3 = upconv(iconv4,   64, 3, 2) #H/4
-            concat3 = tf.concat([upconv3, skip2], 3)
-            iconv3  = conv(concat3,    64, 3, 1)
+            seg_upconv3 = upconv(seg_iconv4,   64, 3, 2) #H/4
+            seg_concat3 = tf.concat([seg_upconv3, skip2], 3)
+            seg_iconv3  = conv(seg_concat3,    64, 3, 1)
             #self.disp3 = self.get_disp(iconv3)
             #udisp3  = self.upsample_nn(self.disp3, 2)
 
-            upconv2 = upconv(iconv3,   32, 3, 2) #H/2
-            concat2 = tf.concat([upconv2, skip1], 3)
-            iconv2  = conv(concat2,    32, 3, 1)
+            seg_upconv2 = upconv(seg_iconv3,   32, 3, 2) #H/2
+            seg_concat2 = tf.concat([seg_upconv2, skip1], 3)
+            seg_iconv2  = conv(seg_concat2,    32, 3, 1)
             #self.disp2 = self.get_disp(iconv2)
             #udisp2  = self.upsample_nn(self.disp2, 2)
 
-            upconv1 = upconv(iconv2,  33, 3, 2) #H
+            seg_upconv1 = upconv(seg_iconv2,  33, 3, 2) #H
             #concat1 = tf.concat([upconv1, udisp2], 3)
-            iconv1  = conv(upconv1,   33, 3, 1, None)
+            seg_iconv1  = conv(seg_upconv1,   33, 3, 1, None)
             #self.disp1 = self.get_disp(iconv1)
-            self.logit = iconv1
+            self.logit = seg_iconv1
 
     def build_model(self):
         with slim.arg_scope([slim.conv2d, slim.conv2d_transpose], activation_fn=tf.nn.elu):
