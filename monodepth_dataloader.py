@@ -87,7 +87,7 @@ class MonodepthDataloader(object):
             min_after_dequeue = 2048
             capacity = min_after_dequeue + 4 * params.batch_size
             self.left_image_batch, self.label_image_batch = tf.train.shuffle_batch([left_image, label_image],
-                        params.batch_size, capacity, min_after_dequeue, params.num_threads)
+                        params.batch_size, capacity, min_after_dequeue, params.num_threads, allow_smaller_final_batch = True)
 
         elif mode == 'test':
             self.left_image_batch = tf.stack([left_image_o,  tf.image.flip_left_right(left_image_o)],  0)
