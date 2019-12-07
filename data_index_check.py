@@ -6,7 +6,7 @@ lines = f.readlines()
 for line in lines:
   new_line = line.rsplit('\n')
   for subline in new_line.split():
-    if(!os.path.exists(subline)):
+    if(not os.path.exists(subline)):
       print(subline)
   
 
