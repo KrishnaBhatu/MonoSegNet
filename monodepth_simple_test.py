@@ -32,7 +32,7 @@ import glob
 parser = argparse.ArgumentParser(description='Monodepth TensorFlow implementation.')
 
 parser.add_argument('--encoder',          type=str,   help='type of encoder, vgg or resnet50', default='vgg')
-arser.add_argument('--image_path',       type=str,   help='path to the image', default='/home/adi_leo96_av/MonoSegNet/sample_data/augsburg/augsburg_000000_001000_leftImg8bit.png')
+parser.add_argument('--image_path',       type=str,   help='path to the image', default='/home/adi_leo96_av/MonoSegNet/sample_data/augsburg/augsburg_000000_001000_leftImg8bit.png')
 parser.add_argument('--test_input_dir',       type=str,   help='path to the test directort', default='/home/adi_leo96_av/training_data/leftImg8bit/test')
 parser.add_argument('--checkpoint_path',  type=str,   help='path to a specific checkpoint to load', required=True)
 parser.add_argument('--input_height',     type=int,   help='input height', default=256)
@@ -86,7 +86,8 @@ def test_simple(params):
     input_images = []
     for folder_name in glob.glob(' args.test_input_dir'+"*"):
         folder_list.append(folder_name - args.test_input_dir)
-    
+    print(folder_list)
+    '''   
         for input_image_path in glob.glob(folder_name + "/*.png"):
             print(input_image_path)
             a = cv2.imread(input_image_path)
@@ -112,6 +113,7 @@ def test_simple(params):
     #plt.imsave(os.path.join(output_directory, "{}_disp.png".format(output_name + str(i+50))), disp_to_img, cmap='plasma')
     
     #print('done!')
+    '''
 
 def main(_):
 
