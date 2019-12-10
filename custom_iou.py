@@ -1,11 +1,19 @@
 
 import numpy as np
 import cv2
+import glob
+
+input_images = []
+for folder_name in glob.glob('C:/Users/hrish/Desktop/Testing/cityscapesScripts-master/MonoSegNet/sample_data/*'):
+    for input_image_path in glob.glob(folder_name + "/*.png"):
+        print(input_image_path)
+        a = cv2.imread(input_image_path)
+        print(a.shape)
 
 eval_segm = cv2.imread('C:/Users/hrish/Desktop/Testing/cityscapesScripts-master/MonoSegNet/sample_data/augsburg/pred.png')
 eval_segm = eval_segm/5
 gt_segm = cv2.imread('C:/Users/hrish/Desktop/Testing/cityscapesScripts-master/MonoSegNet/sample_data/augsburg/gt.png')
-gt_segm = cv2.resize(gt_segm, (512 , 256), interpolation = cv2.INTER_NEAREST)
+#gt_segm = cv2.resize(gt_segm, (512 , 256), interpolation = cv2.INTER_NEAREST)
 eval_segm = eval_segm[:,:,0]
 gt_segm = gt_segm[:,:,0]
 
@@ -123,4 +131,4 @@ def test():
     print("Pixel Accuracy = ", pixel_accuracy(eval_segm, gt_segm))
     print("Mean IOU = ", mean_IU(eval_segm, gt_segm))
     
-test()
+#test()
