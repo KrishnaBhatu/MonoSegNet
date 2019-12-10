@@ -35,6 +35,7 @@ parser.add_argument('--image_path',       type=str,   help='path to the image', 
 parser.add_argument('--checkpoint_path',  type=str,   help='path to a specific checkpoint to load', required=True)
 parser.add_argument('--input_height',     type=int,   help='input height', default=256)
 parser.add_argument('--input_width',      type=int,   help='input width', default=512)
+parser.add_argument('--output_dir', 	  type=str,   help='output dirextory', required=True)
 
 args = parser.parse_args()
 
@@ -110,7 +111,7 @@ def test_simple(params):
     #print(inp[0, 0, 0, 0])
     #chk = chk.flatten()
     #print(chk[1211])
-    output_directory = os.path.dirname(args.image_path)
+    output_directory = args.output_dir #os.path.dirname(args.image_path)
     output_name = os.path.splitext(os.path.basename(args.image_path))[0]
 
     np.save(os.path.join(output_directory, "{}_disp.npy".format(output_name)), disp_pp)
@@ -127,7 +128,7 @@ def test_simple(params):
             #cv2.waitKey(0)
             #break
         #break
-    cv2.imwrite("/home/krishna/magic69.png",copy_image)
+    cv2.imwrite(output_directory + "{}_seg.png".format(output_name + str(i+50)),copy_image)
     
     disp_to_img = scipy.misc.imresize(disp_pp.squeeze(), [original_height, original_width])
     plt.imsave(os.path.join(output_directory, "{}_disp.png".format(output_name + str(i+50))), disp_to_img, cmap='plasma')
