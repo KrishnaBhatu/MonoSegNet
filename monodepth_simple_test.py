@@ -32,8 +32,8 @@ import glob
 parser = argparse.ArgumentParser(description='Monodepth TensorFlow implementation.')
 
 parser.add_argument('--encoder',          type=str,   help='type of encoder, vgg or resnet50', default='vgg')
-arser.add_argument('--image_path',       type=str,   help='path to the image', required=True)
-parser.add_argument('--test_input_dir',       type=str,   help='path to the test directort', required=True)
+arser.add_argument('--image_path',       type=str,   help='path to the image', default='/home/adi_leo96_av/MonoSegNet/sample_data/augsburg/augsburg_000000_001000_leftImg8bit.png')
+parser.add_argument('--test_input_dir',       type=str,   help='path to the test directort', default='/home/adi_leo96_av/training_data/leftImg8bit/test')
 parser.add_argument('--checkpoint_path',  type=str,   help='path to a specific checkpoint to load', required=True)
 parser.add_argument('--input_height',     type=int,   help='input height', default=256)
 parser.add_argument('--input_width',      type=int,   help='input width', default=512)
