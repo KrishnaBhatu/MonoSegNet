@@ -5,8 +5,8 @@ import cv2
 eval_segm = cv2.imread('C:/Users/hrish/Desktop/Testing/cityscapesScripts-master/MonoSegNet/sample_data/augsburg/pred.png')
 eval_segm = eval_segm/5
 gt_segm = cv2.imread('C:/Users/hrish/Desktop/Testing/cityscapesScripts-master/MonoSegNet/sample_data/augsburg/gt.png')
-#gt_segm = cv2.resize(gt_segm,(512,256))
-eval_segm = gt_segm[:,:,0]
+gt_segm = cv2.resize(gt_segm, (512 , 256), interpolation = cv2.INTER_NEAREST)
+eval_segm = eval_segm[:,:,0]
 gt_segm = gt_segm[:,:,0]
 
 def pixel_accuracy(eval_segm, gt_segm):
