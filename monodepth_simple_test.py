@@ -87,6 +87,7 @@ def test_simple(params):
     for folder_name in glob.glob(' args.test_input_dir'+"*"):
         folder_list.append(folder_name - args.test_input_dir)
     print(folder_list)
+    
     '''   
         for input_image_path in glob.glob(folder_name + "/*.png"):
             print(input_image_path)
