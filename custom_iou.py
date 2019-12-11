@@ -137,11 +137,10 @@ def test():
     # for i in range(34):
     #     IU[i] = IU[i]/IU_occurences[i] 
     #    sum += IU[i]
-    IU_occurences = IU_occurences[np.nonzero(IU_occurences)]
+    IU_occurences_ = IU_occurences[np.nonzero(IU_occurences)]
     IU = IU[np.nonzero(IU_occurences)] #Takes care of the situation where in the intersection area is zero
     print("IU = ", IU)
-    print("IU_occurences",IU_occurences)
-    print("IOU = ", IU/IU_occurences)
-    print("mIOU = ", np.mean(IU))
-    
+    print("IU_occurences",IU_occurences_)
+    print("IOU = ", IU/IU_occurences_)
+        
 test()
