@@ -129,12 +129,19 @@ def test():
                 (IU,IU_occurences) = find_IU(eval_segm[:,:,0], gt_segm[:,:,0],IU,IU_occurences)
                 num += 1
                 print(num)
+                #if(num == 10):
+                #    break
             else:
                 print("one of the image is empty")
     sum = 0
     # for i in range(34):
     #     IU[i] = IU[i]/IU_occurences[i] 
     #    sum += IU[i]
+    print("IU_before change", IU)
+    print("IU_occurences before change", IU_occurences)
+    void_list = [0,1,2,3,4,5,6]
+    for ind in void_list:
+        IU_occurences[ind] = 0
     IU_occurences_ = IU_occurences[np.nonzero(IU_occurences)]
     IU = IU[np.nonzero(IU_occurences)] #Takes care of the situation where in the intersection area is zero
     IOU = IU/IU_occurences_
@@ -142,5 +149,4 @@ def test():
     print("IU_occurences",IU_occurences_)
     print("IOU = ", IOU)
     print("mIOU = ", np.mean(IOU))
-    
 test()
