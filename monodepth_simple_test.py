@@ -31,13 +31,13 @@ import glob
 
 parser = argparse.ArgumentParser(description='Monodepth TensorFlow implementation.')
 
-parser.add_argument('--encoder',          type=str,   help='type of encoder, vgg or resnet50', default='vgg')
+parser.add_argument('--encoder',          type=str,   help='type of encoder, vgg or resnet50', default='resnet50')
 parser.add_argument('--image_path',       type=str,   help='path to the image', default='/home/adi_leo96_av/MonoSegNet/sample_data/augsburg/augsburg_000000_001000_leftImg8bit.png')
-parser.add_argument('--test_input_dir',       type=str,   help='path to the test directort', default='/home/adi_leo96_av/training_data/leftImg8bit/test')
-parser.add_argument('--checkpoint_path',  type=str,   help='path to a specific checkpoint to load', required=True)
+parser.add_argument('--test_input_dir',   type=str,   help='path to the test directort', default='/home/adi_leo96_av/training_data/leftImg8bit/test')
+parser.add_argument('--checkpoint_path',  type=str,   help='path to a specific checkpoint to load', default='/home/kbhatu/training_log/trainX/model-500000')
 parser.add_argument('--input_height',     type=int,   help='input height', default=256)
 parser.add_argument('--input_width',      type=int,   help='input width', default=512)
-parser.add_argument('--output_dir', 	  type=str,   help='output dirextory', required=True)
+parser.add_argument('--output_dir', 	  type=str,   help='output dirextory', default='/home/adi_leo96_av/test_output')
 
 args = parser.parse_args()
 
@@ -56,17 +56,13 @@ def test_simple(params):
 
     left  = tf.placeholder(tf.float32, [2, args.input_height, args.input_width, 3])
     model = MonodepthModel(params, "test", left, None)
-    input_image = scipy.misc.imread(args.image_path, mode="RGB")
-    original_height, original_width, num_channels = input_image.shape  
-    input_image = scipy.misc.imresize(input_image, [args.input_height, args.input_width], interp='lanczos')
-    input_image = input_image.astype(np.float32) / 255
-    #input_images = np.stack((input_image, np.fliplr(input_image)), 0)
-    input_image = tf.reshape(input_image, [1, args.input_height, args.input_width, 3])
+    
+    #input_image = tf.reshape(input_image, [1, args.input_height, args.input_width, 3])
     
     # SESSION
     config = tf.ConfigProto(allow_soft_placement=True)
     sess = tf.Session(config=config)
-    input_image = sess.run(input_image)
+    #input_image = sess.run(input_image)
     train_saver = tf.train.Saver()
 
     # INIT
@@ -74,7 +70,6 @@ def test_simple(params):
     sess.run(tf.local_variables_initializer())
     coordinator = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coordinator)
-    
     
     # RESTORE
     restore_path = args.checkpoint_path.split(".")[0]
@@ -84,22 +79,25 @@ def test_simple(params):
     #disp_pp = post_process_disparity(disp.squeeze()).astype(np.float32)
     folder_list = []
     input_images = []
-    for folder_name in glob.glob(' args.test_input_dir'+"*"):
-        folder_list.append(folder_name - args.test_input_dir)
-    print(folder_list)
+    for folder_name in glob.glob(args.test_input_dir + "/*"):
+        print(folder_name)
+        folder_list.append(folder_name[len(args.test_input_dir):])
     
-    '''   
-        for input_image_path in glob.glob(folder_name + "/*.png"):
-            print(input_image_path)
-            a = cv2.imread(input_image_path)
-            print(a.shape)
+    print(folder_list)
+    output_directory = args.output_dir #os.path.dirname(args.image_path)
 
+    for folder in folder_list:
+        for input_image_path in glob.glob(args.test_input_dir + "/" + folder + "*.png"):
+            #print(input_image_path)
+            #print(a.shape)
+            # Reading and modifying
+            input_image = scipy.misc.imread(input_image_path, mode="RGB")
+            #original_height, original_width, num_channels = input_image.shape  
+            input_image = scipy.misc.imresize(input_image, [args.input_height, args.input_width], interp='lanczos')
+            input_image = input_image.astype(np.float32) / 255
             input_images = np.stack((input_image, np.fliplr(input_image)), 0)
-            out_seg = sess.run(model.logit, feed_dict={left: input_images})
-            
-            output_directory = args.output_dir #os.path.dirname(args.image_path)
+            out_seg = sess.run(model.logit, feed_dict={left: input_images})        
             output_name = os.path.splitext(os.path.basename(input_image_path))[0]
-
             #np.save(os.path.join(output_directory, "{}_disp.npy".format(output_name)), disp_pp)
             copy_image = np.zeros((256,512,1), np.uint8)
             
@@ -108,13 +106,14 @@ def test_simple(params):
                     b = np.argmax(out_seg[0,i,j,:])
                     copy_image[i][j] = b#*5
 
-            cv2.imwrite(output_directory + folder_name + "{}_seg.png".format(output_name + str(i+50)),copy_image)
-        
+            cv2.imwrite(output_directory + "/" folder_name + "{}_seg.png".format(output_name + str(i+50)),copy_image)
+            break
+        break
     #disp_to_img = scipy.misc.imresize(disp_pp.squeeze(), [original_height, original_width])
     #plt.imsave(os.path.join(output_directory, "{}_disp.png".format(output_name + str(i+50))), disp_to_img, cmap='plasma')
     
     #print('done!')
-    '''
+    
 
 def main(_):
 
