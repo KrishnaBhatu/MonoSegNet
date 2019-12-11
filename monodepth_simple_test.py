@@ -31,13 +31,13 @@ import glob
 
 parser = argparse.ArgumentParser(description='Monodepth TensorFlow implementation.')
 
-parser.add_argument('--encoder',          type=str,   help='type of encoder, vgg or resnet50', default='vgg')
+parser.add_argument('--encoder',          type=str,   help='type of encoder, vgg or resnet50', default='resnet50')
 parser.add_argument('--image_path',       type=str,   help='path to the image', default='/home/adi_leo96_av/MonoSegNet/sample_data/augsburg/augsburg_000000_001000_leftImg8bit.png')
-parser.add_argument('--test_input_dir',       type=str,   help='path to the test directort', default='/home/adi_leo96_av/training_data/leftImg8bit/test')
-parser.add_argument('--checkpoint_path',  type=str,   help='path to a specific checkpoint to load', required=True)
+parser.add_argument('--test_input_dir',   type=str,   help='path to the test directort', default='/home/adi_leo96_av/training_data/leftImg8bit/test')
+parser.add_argument('--checkpoint_path',  type=str,   help='path to a specific checkpoint to load', default='/home/kbhatu/training_log/trainX/model-500000')
 parser.add_argument('--input_height',     type=int,   help='input height', default=256)
 parser.add_argument('--input_width',      type=int,   help='input width', default=512)
-parser.add_argument('--output_dir', 	  type=str,   help='output dirextory', required=True)
+parser.add_argument('--output_dir', 	  type=str,   help='output dirextory', default='/home/adi_leo96_av/test_output')
 
 args = parser.parse_args()
 
@@ -84,11 +84,15 @@ def test_simple(params):
     #disp_pp = post_process_disparity(disp.squeeze()).astype(np.float32)
     folder_list = []
     input_images = []
-    for folder_name in glob.glob(' args.test_input_dir'+"*"):
-        folder_list.append(folder_name - args.test_input_dir)
+    for folder_name in glob.glob(args.test_input_dir + "/*"):
+        print(folder_name)
+        folder_list.append(folder_name[len(args.test_input_dir):])
+    
     print(folder_list)
-    '''   
-        for input_image_path in glob.glob(folder_name + "/*.png"):
+    
+       
+    for folder in folder_list:
+        
             print(input_image_path)
             a = cv2.imread(input_image_path)
             print(a.shape)
