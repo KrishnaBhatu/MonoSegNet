@@ -131,8 +131,6 @@ def test():
                 print(num)
             else:
                 print("one of the image is empty")
-            if(num==500):
-                break
     sum = 0
     # for i in range(34):
     #     IU[i] = IU[i]/IU_occurences[i] 
