@@ -142,5 +142,6 @@ def test():
     print("IU = ", IU)
     print("IU_occurences",IU_occurences_)
     print("IOU = ", IU/IU_occurences_)
-        
+    print("mIOU = ", np.mean(IU))
+    
 test()
