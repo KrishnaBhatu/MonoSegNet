@@ -20,7 +20,7 @@ f = open("/home/adi_leo96_av/MonoSegNet/test_index.txt", 'w')
 
 for folder in folder_list:
     for image_path in glob.glob(args.pred_dir+folder+"/*.png"):
-        f.write(image_path + ' ' + args.label_dir + "/" + os.path.basename(image_path)[:-19]+"gtCoarse_labelIds.png"+'\n')
+        f.write(image_path + ' ' + args.label_dir + folder + "/" + os.path.basename(image_path)[:-19]+"gtCoarse_labelIds.png\n")
     #print(os.path.basename(i)[:-19])    
 f.close
 #print(list_q)

@@ -48,10 +48,14 @@ def find_IU(eval_segm, gt_segm,IU,IU_occurences):
             continue
 
         n_ii = np.sum(np.logical_and(curr_eval_mask, curr_gt_mask)) # intersection
-        t_i  = np.sum(curr_gt_mask) # 
+        t_i  = np.sum(curr_gt_mask) #
         n_ij = np.sum(curr_eval_mask) #union
-
-        IU[c] += n_ii / (t_i + n_ij - n_ii) # preventing the double counting of intersection
+        value = n_ii/(t_i+n_ij-n_ii)
+        if(value > 1):
+            print(n_ii," ",t_i," ", n_ij)
+        IU[c] += value # preventing the double counting of intersection
+        #if(IU[c] == 0):
+        #    print(n_ii," ",t_i," ", n_ij)
         IU_occurences[c] += 1
     #mean_IU_ = np.sum(IU) / n_cl_gt #classes in gt but not predicted by model are considered in acc but not vice versa
     return (IU, IU_occurences) # penalize FP and FN
@@ -73,9 +77,9 @@ def extract_classes(segm):
 
 def check_size(eval_segm, gt_segm):
     h_e, w_e = segm_size(eval_segm)
-    print("eval = ",h_e,",",w_e)
+    #print("eval = ",h_e,",",w_e)
     h_g, w_g = segm_size(gt_segm)
-    print("gt = ",h_g,",",w_g)
+    #print("gt = ",h_g,",",w_g)
     if (h_e != h_g) or (w_e != w_g):
         print("size mismatch")
         return False
@@ -110,21 +114,34 @@ def test():
     #print("Gt clases = {} and number = {}".format(cl,n_cl))
     #check_size(eval_segm, gt_segm)
     #print("Pixel Accuracy = ", pixel_accuracy(eval_segm, gt_segm))
-    IU = list([0]) * 35 # making a list to store all the IOUs
-    IU_occurences = list([0])*35 # for the 35 clasees    
-    with open('/home/adi_leo96_av/MonoSegNet/*.txt','r') as f:
+    IU = np.zeros(35) # making a list to store all the IOUs
+    IU_occurences = np.zeros(35) # for the 35 clasees    
+    num = 0
+    with open('/home/adi_leo96_av/MonoSegNet/test_index.txt','r') as f:
         for line in f:
             paths = line.split(' ')
-            eval_segm = cv2.imread(path[0])
-            gt_segm = cv2.imread(path[1])
-            gt_segm = cv2.resize(gt_segm,(512,256),interpolation=cv2.INTER_NEAREST)
-            (IU,IU_occurences) = find_IU(eval_segm[:,:,0], gt_segm[:,:,0],IU,IU_occurences)
+            paths[1] = paths[1][:-1]
+            #print(paths)
+            eval_segm = cv2.imread(paths[0])
+            gt_segm = cv2.imread(paths[1])
+            if(eval_segm is not None and gt_segm is not None):
+                gt_segm = cv2.resize(gt_segm,(512,256),interpolation = cv2.INTER_NEAREST)
+                (IU,IU_occurences) = find_IU(eval_segm[:,:,0], gt_segm[:,:,0],IU,IU_occurences)
+                num += 1
+                print(num)
+            else:
+                print("one of the image is empty")
+            if(num==500):
+                break
     sum = 0
-    for i in range(34):
-        IU[i] = IU[i]/IU_occurences[i] 
-        sum += IU[i]
-
-    print("IOU = ", IU)
-    print("mIOU = ", sum/35)
+    # for i in range(34):
+    #     IU[i] = IU[i]/IU_occurences[i] 
+    #    sum += IU[i]
+    IU_occurences = IU_occurences[np.nonzero(IU_occurences)]
+    IU = IU[np.nonzero(IU_occurences)] #Takes care of the situation where in the intersection area is zero
+    print("IU = ", IU)
+    print("IU_occurences",IU_occurences)
+    print("IOU = ", IU/IU_occurences)
+    print("mIOU = ", np.mean(IU))
     
-#test()
+test()
